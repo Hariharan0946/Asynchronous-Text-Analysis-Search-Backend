@@ -197,7 +197,7 @@ Failure cases:
 
 Logout User  
 Endpoint: POST /api/auth/logout/
-
+<img width="1088" height="623" alt="image" src="https://github.com/user-attachments/assets/959e327f-ff7c-4f48-86e2-e1e61eb3e40d" />
 ---
 
 ### 📝 Text APIs (Authenticated)
@@ -212,7 +212,8 @@ Request body example:
 
 Response:
 - processing: true
-  <img width="1088" height="623" alt="image" src="https://github.com/user-attachments/assets/959e327f-ff7c-4f48-86e2-e1e61eb3e40d" />
+ <img width="789" height="855" alt="image" src="https://github.com/user-attachments/assets/536a530e-5149-494d-b463-027e74ed8c53" />
+
 
 
 ---
@@ -228,7 +229,8 @@ Results are:
 - User-specific
 - Limited to top 10
 - Ordered by highest frequency
-<img width="776" height="946" alt="image" src="https://github.com/user-attachments/assets/ea7ab29b-1287-4f19-ba05-29820614d8d0" />
+<img width="776" height="946" alt="image" src="https://github.com/user-attachments/assets/7637905c-83fb-4c24-8a64-2bcc5c61f41c" />
+
 
 ---
 
@@ -322,6 +324,7 @@ LeetCode: https://leetcode.com/u/NDvaDaMsfm/
 ### ✅ Submission Ready
 
 This README fully satisfies Codemonk’s expectations for documentation, clarity, design understanding, and reproducibility.
+
 
 
 
