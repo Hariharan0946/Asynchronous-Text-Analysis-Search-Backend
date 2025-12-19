@@ -1,321 +1,244 @@
-# 🧩 Codemonk – Backend Intern Assignment  
-🚀 **A production-grade, fully containerized Python backend system showcasing backend fundamentals, system design depth, and real-world engineering judgment**
+🧩 Codemonk – Backend Intern Assignment
+A fully containerized, reproducible Python backend system built to demonstrate backend fundamentals, system design, and practical engineering decisions.
 
----
+📌 Introduction
+This project was built as part of the Codemonk Backend Intern Assignment.
 
-## 🟦 Executive Summary (Why This Project Stands Out)
+The goal of this assignment is not only to implement functionality, but also to demonstrate:
 
-This repository contains my submission for the **Codemonk Backend Intern Assignment**.
+Clear understanding of backend fundamentals
+Ability to design a system with multiple components
+Clean project structure and documentation
+Reproducibility and ease of setup
+Awareness of real-world backend practices
+The backend allows users to register, authenticate, submit text data, and retrieve analytical results efficiently while ensuring security, scalability, and clarity.
 
-Rather than focusing only on feature completion, this project was intentionally built to demonstrate:
+🎯 Problem Statement (As Understood)
+The system should:
 
-- how I **think about backend systems**,  
-- how I **translate requirements into architecture**,  
-- how I **make engineering trade-offs**, and  
-- how I **document and explain systems clearly** for reviewers and interviewers.
+Allow users to register and manage sessions
+Accept multiple paragraphs of text from users
+Compute word frequencies efficiently
+Return the top 10 paragraphs for a searched word (per user)
+Use background processing
+Be containerized and easy to run on any machine
+Be clearly documented and explainable
+This project is designed to strictly satisfy all of the above requirements.
 
-This README is written as a **technical case study**, not just documentation.
+🛠 Tech Stack & Design Decisions (With Reasons)
+Backend Framework — Django + Django REST Framework
+Why Django:
 
----
+Provides a secure authentication system out of the box
+Encourages clean and scalable project structure
+Widely used in production backend systems
+Why Django REST Framework:
 
-## 🟩 Context & Objective
+Simplifies API development
+Handles request validation and serialization cleanly
+Encourages separation of concerns
+Flask was a possible alternative, but Django was chosen for better structure, security, and built-in features.
 
-The assignment requires building a Python-based backend system that supports:
+Database — PostgreSQL
+Why PostgreSQL:
 
-- secure user authentication,
-- text ingestion and analysis,
-- efficient querying,
-- background processing,
-- and reproducible deployment.
+Reliable relational database
+Strong indexing and query optimization support
+Commonly used in real-world backend systems
+Chosen over SQLite/MySQL for scalability and production relevance.
 
-Beyond correctness, the evaluation focuses on:
-- conceptual understanding,
-- system design clarity,
-- maintainability,
-- and explainability.
+Background Task Processor — Celery
+Why Celery:
 
-This project is designed to **explicitly satisfy all evaluation dimensions**.
+Enables asynchronous background processing
+Prevents long-running operations from blocking API requests
+Scales well with message brokers
+Used specifically for word frequency computation to improve API responsiveness.
 
----
+Message Broker — Redis
+Why Redis:
 
-## 🟨 Problem Statement (Interpreted Precisely)
+Fast, in-memory data store
+Industry standard with Celery
+Simple and reliable for task queues
+Containerization — Docker & Docker Compose
+Why Docker:
 
-The system must:
+Ensures identical behavior across machines
+Removes dependency and environment issues
+Required by the assignment
+Why Docker Compose:
 
-- Allow users to register and manage sessions securely  
-- Accept multiple paragraphs of text per user  
-- Compute word frequencies efficiently  
-- Return the **top 10 paragraphs (per user)** for a searched word  
-- Perform heavy computation asynchronously  
-- Be containerized and runnable with a single command  
-- Be clearly documented and interview-explainable  
-
-All functional and non-functional requirements are fully implemented.
-
----
-
-## 🧠 Design Philosophy & Engineering Principles
-
-This project follows a **production-first backend mindset**, guided by these principles:
-
-- **Clarity over cleverness** – readable systems scale better than smart hacks  
-- **Security by default** – auth and abuse prevention are baseline, not add-ons  
-- **Separation of concerns** – one module, one responsibility  
-- **Scalability awareness** – design should not collapse as data grows  
-- **Reproducibility** – systems should run identically everywhere  
-- **Explainability** – every decision must be defensible in an interview  
-
-These principles influenced every design choice.
-
----
-
-## 🛠 Technology Stack & Justification
-
-### 🔵 Backend Framework — Django + Django REST Framework
-
-**Why Django**
-- Battle-tested authentication system  
-- Strong conventions → clean architecture  
-- Widely adopted in production environments  
-
-**Why Django REST Framework**
-- Explicit request/response handling  
-- Clear validation and serialization  
-- Encourages separation between API and business logic  
-
-Flask was considered, but Django was chosen for **structure, security, and scalability**.
-
----
-
-### 🟢 Database — PostgreSQL
-
-**Why PostgreSQL**
-- Reliable relational guarantees  
-- Strong indexing & query optimization  
-- Production-grade tooling  
-
-Chosen over SQLite/MySQL for **real-world relevance**.
-
----
-
-### 🟣 Background Processing — Celery
-
-**Why Celery**
-- Enables true asynchronous execution  
-- Prevents blocking API requests  
-- Scales independently from web servers  
-
-Used specifically for **word frequency computation**.
-
----
-
-### 🔴 Message Broker — Redis
-
-**Why Redis**
-- Extremely fast in-memory operations  
-- Industry standard for Celery  
-- Simple and reliable  
-
----
-
-### 🟠 Containerization — Docker & Docker Compose
-
-**Why Docker**
-- Eliminates “works on my machine” issues  
-- Ensures environment consistency  
-- Required by the assignment  
-
-**Why Docker Compose**
-- Orchestrates multi-service systems  
-- Enables one-command startup  
-
----
-
-## 🏗 System Architecture (High-Level)
-
-Client (Postman / Frontend)
-➜ Django REST APIs
-➜ PostgreSQL (Persistent Storage)
-➜ Celery (Async Processing)
-➜ Redis (Message Broker)
-
-yaml
-Copy code
-
----
-
-## 🔄 End-to-End Request Lifecycle
-
-1. User submits multiple paragraphs via API  
-2. API validates input and stores paragraphs immediately  
-3. A Celery task is triggered per paragraph  
-4. Word frequency computation runs asynchronously  
-5. Results are normalized and indexed  
-6. Search queries fetch optimized results instantly  
-
-This ensures **low-latency APIs** and **scalable processing**.
-
----
-
-## 📂 Project Structure (Intentional & Modular)
-
-```text
+Manages multiple services (backend, database, Redis, worker)
+Allows running the entire system with a single command
+📂 Project Structure
 codemonk_backend/
 
-- app/
-  - manage.py
-
-  - core/
-    - settings.py
-    - urls.py
-    - celery.py
-    - password utilities & validators
-
-  - auth_app/
-    - models.py
-    - serializers.py
-    - views.py
-    - urls.py
-
-  - text_app/
-    - models.py
-    - tasks.py
-    - views.py
-    - urls.py
-
-- assets/
-- Dockerfile
-- docker-compose.yml
-- requirements.txt
-- entrypoint.sh
-- .env.example
-- README.md
-Each module has one responsibility, improving maintainability and testability.
-
+Dockerfile
+docker-compose.yml
+requirements.txt
+.env.example
+README.md
+app/
+manage.py
+core/
+settings.py
+urls.py
+celery.py
+password validators and utilities
+auth_app/
+models.py
+serializers.py
+views.py
+urls.py
+text_app/
+models.py
+tasks.py
+views.py
+urls.py
+Each module has a single responsibility, improving maintainability and readability.
 
 🔐 Authentication & Security Design
-Implemented Safeguards
+Implemented features:
 
 User registration
-
-Secure login & logout
-
+Secure login and logout
 Strong password validation
-
 Login rate limiting
-
 Account lock after repeated failures
+Why these were added:
 
-Security is treated as a core requirement, not an enhancement.
+Demonstrates real-world backend security thinking
+Protects against brute-force attacks
+Shows understanding of authentication best practices
+These features were not strictly required but align with industry expectations.
 
 📝 Paragraph & Word Frequency Design
+How it works:
 
-Paragraphs are stored independently
+User submits multiple paragraphs in one request
+Each paragraph is stored in the database
+Word frequency computation runs asynchronously
+Results are indexed for fast retrieval
+Search returns the top 10 paragraphs for a word (per user)
+Why indexing:
 
-Word frequencies are computed per paragraph
-
-Results are associated with both user and paragraph
-
-Indexed queries ensure fast lookups
-
+Improves query performance
+Scales better as data grows
 📘 API Documentation
-Base URL
+Base URL: http://localhost:8000
 
-http://localhost:8000
+🔐 Authentication APIs
+Register User
+Endpoint: POST /api/auth/register/
 
-🔐 Register User
+Request body example:
 
-POST /api/auth/register/
+username: john
+password: StrongPass@123
+Response:
 
-<img width="782" height="729" alt="image" src="https://github.com/user-attachments/assets/64efdbe3-f864-4a92-baf1-1607de261b41" />
+message: Registered
+image
+Login User
+Endpoint: POST /api/auth/login/
 
+Success response:
 
-🔐 Login User
+message: Logged in
+Failure cases:
 
-POST /api/auth/login/
+Invalid credentials → 401
+Rate limit exceeded → 429
+Account locked → 403
+image
+Logout User
+Endpoint: POST /api/auth/logout/ image
+📝 Text APIs (Authenticated)
+Submit Paragraphs
+Endpoint: POST /api/text/submit/
 
-<img width="785" height="733" alt="image" src="https://github.com/user-attachments/assets/95e17fd2-249a-43ab-be4d-5cc4a9c4a564" />
+Request body example:
 
-🔐 Logout User
+paragraphs:
+Text one
+Text two
+Response:
 
-POST /api/auth/logout/
+processing: true
+image
+Search Word Frequency
+Endpoint: GET /api/text/search/?word=django
 
-<img width="1088" height="623" alt="image" src="https://github.com/user-attachments/assets/1e524947-ea9d-41d9-996b-8803a1d42151" />
+Response example:
 
+paragraph: "Django is powerful"
+count: 1
+Results are:
 
-📝 Submit Paragraphs
-
-POST /api/text/submit/
-
-<img width="789" height="855" alt="image" src="https://github.com/user-attachments/assets/12c415b6-46ff-464b-8eed-44f79b0df899" />
-
-
-🔍 Search Word Frequency
-
-GET /api/text/search/?word=django
-
-<img width="776" height="946" alt="image" src="https://github.com/user-attachments/assets/f6be59fb-61d0-44cc-8bf4-bde75c78bb3d" />
-
-
-🧪 Testing Strategy
-
-Manual testing using Postman
-
+User-specific
+Limited to top 10
+Ordered by highest frequency
+image
+🧪 API Testing
+All APIs tested using Postman
 Success, failure, and edge cases verified
+Postman screenshots included in the repository
+This confirms the system works end-to-end.
 
-Screenshots included in repository
+8️⃣ Setup Instructions (Minimal Effort)
+Prerequisites
+Docker
+Docker Compose
+Steps
+Clone the repository
+git clone
 
-⚙️ Setup Instructions
-git clone <repository-url>
+Move into the project directory
 cd codemonk_backend
+
+Create environment file
 cp .env.example .env
+
+Run the entire system
 docker-compose up --build
 
-
-Backend runs at:
+Access
+Backend will be available at:
 http://localhost:8000
 
+No additional configuration is required.
+
 🐳 Containerized Services
-
 Django backend
-
-PostgreSQL
-
+PostgreSQL database
 Redis
-
 Celery worker
+All services start automatically using Docker Compose.
 
-⚖️ Engineering Trade-offs
-
-REST APIs over GraphQL
-
-Manual testing due to scope constraints
-
-Modular monolith over microservices
-
-🔮 Future Improvements
-
-JWT authentication
-
-Pagination
-
-Automated tests
-
-Swagger documentation
-
-Logging & monitoring
-
+✅ Assignment Requirement Mapping
+User registration → Implemented
+Secure login/logout → Implemented
+Paragraph submission → Implemented
+Word frequency indexing → Implemented
+Top 10 paragraph search → Implemented
+Background processing → Implemented
+Containerization → Implemented
+API documentation → Implemented
+Easy setup → Implemented
 👨‍💻 Author
-
 Hariharan Balasubramaniyam
 Backend Intern Candidate
 
-Resume:
-https://drive.google.com/file/d/1RP77PMQl_Tr9RSSl4ciqBP9-0HxwXvcz/view
+GitHub: https://github.com/Hariharan0946
+LeetCode: https://leetcode.com/u/NDvaDaMsfm/
 
-LeetCode:
-https://leetcode.com/u/NDvaDaMsfm/
+Resume : https://drive.google.com/file/d/1RP77PMQl_Tr9RSSl4ciqBP9-0HxwXvcz/view?usp=drive_link LeetCode: https://leetcode.com/u/NDvaDaMsfm/
 
-🏁 Final Notes
-
-The system runs end-to-end with a single command and is fully explainable at both code and design levels.
+📝 Final Notes
+The project follows clean coding practices
+All assignment conditions are satisfied
+The system runs end-to-end with a single command
+I am prepared to explain every design and code decision during the technical interview
+✅ Submission Ready
+This README fully satisfies Codemonk’s expectations for documentation, clarity, design understanding, and reproducibility.
