@@ -131,9 +131,16 @@ Used specifically for **word frequency computation**.
 
 ---
 
-## 🏗 System Architecture (High-Level) 
+## 🏗 System Architecture (High-Level)
 
-Client (Postman / Frontend)  ➤  Django REST APIs  ➤ PostgreSQL (Persistent Storage) ➤ Celery (Async Processing)  ➤  Redis (Message Broker)  
+Client (Postman / Frontend)
+➜ Django REST APIs
+➜ PostgreSQL (Persistent Storage)
+➜ Celery (Async Processing)
+➜ Redis (Message Broker)
+
+yaml
+Copy code
 
 ---
 
@@ -146,7 +153,7 @@ Client (Postman / Frontend)  ➤  Django REST APIs  ➤ PostgreSQL (Persistent S
 5. Results are normalized and indexed  
 6. Search queries fetch optimized results instantly  
 
-This ensures **low latency APIs** and **scalable processing**.
+This ensures **low-latency APIs** and **scalable processing**.
 
 ---
 
@@ -156,27 +163,27 @@ This ensures **low latency APIs** and **scalable processing**.
 codemonk_backend/
 
 - app/
+  - manage.py
 
-    - manage.py
+  - core/
+    - settings.py
+    - urls.py
+    - celery.py
+    - password utilities & validators
 
-    - core/
-        - settings.py              # Global Django configuration
-        - urls.py                  # Root URL routing
-        - celery.py                # Celery application setup
-        - password utilities & validators
+  - auth_app/
+    - models.py
+    - serializers.py
+    - views.py
+    - urls.py
 
-    - auth_app/
-        - models.py                # User extensions & security fields
-        - serializers.py           # Input validation & user creation
-        - views.py                 # Register / Login / Logout APIs
-        - urls.py                  # Auth routes
+  - text_app/
+    - models.py
+    - tasks.py
+    - views.py
+    - urls.py
 
-    - text_app/
-        - models.py                # Paragraph & word-frequency schema
-        - tasks.py                 # Background computation logic
-        - views.py                 # Submit & search APIs
-        - urls.py                  # Text routes
-
+- assets/
 - Dockerfile
 - docker-compose.yml
 - requirements.txt
@@ -185,8 +192,10 @@ codemonk_backend/
 - README.md
 Each module has one responsibility, improving maintainability and testability.
 
+
 🔐 Authentication & Security Design
 Implemented Safeguards
+
 User registration
 
 Secure login & logout
@@ -197,191 +206,104 @@ Login rate limiting
 
 Account lock after repeated failures
 
-Rationale
-These measures:
-
-prevent brute-force attacks,
-
-demonstrate security awareness,
-
-align with industry best practices.
-
 Security is treated as a core requirement, not an enhancement.
 
 📝 Paragraph & Word Frequency Design
-Processing Flow
+
 Paragraphs are stored independently
 
 Word frequencies are computed per paragraph
 
 Results are associated with both user and paragraph
 
-Old frequency data is replaced on reprocessing
+Indexed queries ensure fast lookups
 
-Why Indexing Matters
-Faster search queries
+📘 API Documentation
+Base URL
 
-Reduced database scans
-
-Predictable performance at scale
-
-## 📘 API Documentation
-
-Base URL:
 http://localhost:8000
 
----
+🔐 Register User
 
-### 🔐 Authentication APIs
+POST /api/auth/register/
 
-Register User  
-Endpoint: POST /api/auth/register/
-
-Request body example:
-- username: john
-- password: StrongPass@123
-
-Response:
-- message: Registered
-<img width="782" height="729" alt="image" src="https://github.com/user-attachments/assets/0e1f60b8-5bc7-4432-a6d3-42d36129d021" />
-
----
-
-Login User  
-Endpoint: POST /api/auth/login/
-
-Success response:
-- message: Logged in
-
-Failure cases:
-- Invalid credentials → 401
-- Rate limit exceeded → 429
-- Account locked → 403
-<img width="785" height="733" alt="image" src="https://github.com/user-attachments/assets/509638f3-2b72-426c-80b9-8abbd6ea7855" />
-
----
-
-Logout User  
-Endpoint: POST /api/auth/logout/
-<img width="1088" height="623" alt="image" src="https://github.com/user-attachments/assets/959e327f-ff7c-4f48-86e2-e1e61eb3e40d" />
----
-
-### 📝 Text APIs (Authenticated)
-
-Submit Paragraphs  
-Endpoint: POST /api/text/submit/
-
-Request body example:
-- paragraphs:
-  - Text one
-  - Text two
-
-Response:
-- processing: true
- <img width="789" height="855" alt="image" src="https://github.com/user-attachments/assets/536a530e-5149-494d-b463-027e74ed8c53" />
+<img width="782" height="729" alt="image" src="https://github.com/user-attachments/assets/64efdbe3-f864-4a92-baf1-1607de261b41" />
 
 
+🔐 Login User
 
----
+POST /api/auth/login/
 
-Search Word Frequency  
-Endpoint: GET /api/text/search/?word=django
+<img width="785" height="733" alt="image" src="https://github.com/user-attachments/assets/95e17fd2-249a-43ab-be4d-5cc4a9c4a564" />
 
-Response example:
-- paragraph: "Django is powerful"
-- count: 1
+🔐 Logout User
 
-Results are:
-- User-specific
-- Limited to top 10
-- Ordered by highest frequency
-<img width="776" height="946" alt="image" src="https://github.com/user-attachments/assets/7637905c-83fb-4c24-8a64-2bcc5c61f41c" />
+POST /api/auth/logout/
+
+<img width="1088" height="623" alt="image" src="https://github.com/user-attachments/assets/1e524947-ea9d-41d9-996b-8803a1d42151" />
 
 
----
+📝 Submit Paragraphs
+
+POST /api/text/submit/
+
+<img width="789" height="855" alt="image" src="https://github.com/user-attachments/assets/12c415b6-46ff-464b-8eed-44f79b0df899" />
+
+
+🔍 Search Word Frequency
+
+GET /api/text/search/?word=django
+
+<img width="776" height="946" alt="image" src="https://github.com/user-attachments/assets/f6be59fb-61d0-44cc-8bf4-bde75c78bb3d" />
+
 
 🧪 Testing Strategy
 
-Manual testing via Postman
+Manual testing using Postman
 
 Success, failure, and edge cases verified
 
 Screenshots included in repository
 
-Ensures end-to-end correctness.
-
-⚙️ Setup Instructions (One Command)
-Prerequisites
-
-Docker
-
-Docker Compose
-
-Run
+⚙️ Setup Instructions
 git clone <repository-url>
 cd codemonk_backend
 cp .env.example .env
 docker-compose up --build
 
 
-Backend available at:
+Backend runs at:
 http://localhost:8000
 
 🐳 Containerized Services
 
 Django backend
 
-PostgreSQL database
+PostgreSQL
 
 Redis
 
 Celery worker
 
-All services start automatically.
-
 ⚖️ Engineering Trade-offs
 
-REST APIs over GraphQL (simplicity & clarity)
+REST APIs over GraphQL
 
 Manual testing due to scope constraints
 
 Modular monolith over microservices
 
-These trade-offs favor maintainability and evaluability.
-
 🔮 Future Improvements
 
-Given more time, I would add:
+JWT authentication
 
-JWT-based authentication
+Pagination
 
-Pagination for large datasets
+Automated tests
 
-Automated test coverage
+Swagger documentation
 
-Swagger / OpenAPI docs
-
-Structured logging & monitoring
-
-Advanced text normalization
-
-✅ Requirement Mapping
-
-User registration → Implemented
-
-Secure auth → Implemented
-
-Paragraph submission → Implemented
-
-Word frequency indexing → Implemented
-
-Top 10 search → Implemented
-
-Background processing → Implemented
-
-Containerization → Implemented
-
-Documentation → Implemented
+Logging & monitoring
 
 👨‍💻 Author
 
@@ -396,31 +318,4 @@ https://leetcode.com/u/NDvaDaMsfm/
 
 🏁 Final Notes
 
-This project demonstrates:
-
-strong backend fundamentals,
-
-thoughtful system design,
-
-production-aware decisions,
-
-and clear technical communication.
-
-The system runs end-to-end with a single command, and I am fully prepared to explain every architectural and code-level decision during the technical interview.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+The system runs end-to-end with a single command and is fully explainable at both code and design levels.
