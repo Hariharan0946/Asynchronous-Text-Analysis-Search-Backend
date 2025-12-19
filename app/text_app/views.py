@@ -1,41 +1,43 @@
 from rest_framework.views import APIView
-# Base class for building RESTful API endpoints
+# Base class for creating class-based REST API views
 
 from rest_framework.permissions import IsAuthenticated
-# Ensures only authenticated users can access these endpoints
+# Restricts access so that only authenticated users can call these APIs
 
 from rest_framework.response import Response
 from rest_framework import status
-# Utilities for structured API responses and HTTP status codes
+# Response helper and HTTP status codes for consistent API replies
 
 from .models import Paragraph, WordFrequency
-# Models used for paragraph storage and frequency lookup
+# Paragraph: stores raw user text
+# WordFrequency: stores computed word counts per paragraph per user
 
 from .tasks import compute_frequency
-# Background task responsible for word frequency computation
+# Celery background task used to compute word frequency asynchronously
 
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-# CSRF utilities for session-based API handling
+# Utilities to disable CSRF for API-only, session-based endpoints
 
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Submit(APIView):
-    # Endpoint for submitting multiple paragraphs in a single request
+    # API endpoint responsible for accepting multiple paragraphs in one request
     permission_classes = [IsAuthenticated]
+    # Only logged-in users are allowed to submit paragraphs
 
     def post(self, request):
-        # Extract paragraph list from request payload
+        # Extract the list of paragraphs from the incoming request payload
         paragraphs = request.data.get("paragraphs", [])
         
-        # Validate presence of paragraph data
+        # Validate that paragraph data is provided
         if not paragraphs:
             return Response(
                 {"error": "No paragraphs provided"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Ensure payload format is a list
+        # Ensure the input is a list (not string, dict, etc.)
         if not isinstance(paragraphs, list):
             return Response(
                 {"error": "Paragraphs must be a list"},
@@ -43,20 +45,23 @@ class Submit(APIView):
             )
         
         created_ids = []
+        # Iterate through each paragraph submitted by the user
         for text in paragraphs:
-            # Create paragraph records only for valid text entries
+            # Create records only for valid, non-empty string inputs
             if text and isinstance(text, str):
                 p = Paragraph.objects.create(
-                    user=request.user,
-                    content=text
+                    user=request.user,   # Associate paragraph with authenticated user
+                    content=text         # Store raw paragraph content
                 )
 
-                # Trigger asynchronous word frequency computation
+                # Trigger background processing for word frequency computation
+                # This runs asynchronously and does NOT block the API response
                 compute_frequency.delay(p.id)
 
+                # Store created paragraph IDs for response tracking
                 created_ids.append(p.id)
         
-        # Return immediate response while processing continues in background
+        # Return immediately while background processing continues
         return Response(
             {
                 "message": f"Processing {len(created_ids)} paragraphs",
@@ -64,49 +69,55 @@ class Submit(APIView):
                 "processing": True
             },
             status=status.HTTP_202_ACCEPTED
+            # 202 indicates request accepted but processing is not yet complete
         )
 
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Search(APIView):
-    # Endpoint for retrieving top paragraphs by word frequency
+    # API endpoint for retrieving top paragraphs by word frequency
     permission_classes = [IsAuthenticated]
+    # Only authenticated users can search their own data
 
     def get(self, request):
-        # Extract and normalize search word from query parameters
+        # Extract search word from query parameters
+        # Normalized to lowercase to ensure case-insensitive matching
         word = request.query_params.get("word", "").strip().lower()
         
-        # Validate required query parameter
+        # Validate that a search word is provided
         if not word:
             return Response(
                 {"error": "Word parameter is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Query word frequency data scoped to the authenticated user
+        # Query word frequency records scoped to the logged-in user
+        # select_related is used to avoid extra database queries
         qs = (
             WordFrequency.objects
-            .filter(user=request.user, word=word)
-            .select_related('paragraph')
-            .order_by("-count")[:10]
+            .filter(user=request.user, word=word)  # User-specific search isolation
+            .select_related('paragraph')            # Optimizes DB access
+            .order_by("-count")[:10]                # Top 10 results by frequency
         )
 
         results = []
+        # Build clean, concise response payload for each result
         for q in qs:
-            # Build concise, user-facing response payload
             results.append({
-                "paragraph_id": q.paragraph.id,
+                "paragraph_id": q.paragraph.id,  # Reference to original paragraph
                 "content": (
                     q.paragraph.content[:100] + "..."
                     if len(q.paragraph.content) > 100
                     else q.paragraph.content
-                ),
-                "count": q.count,
+                ),  # Content preview capped at 100 characters
+                "count": q.count,                 # Frequency of searched word
                 "created_at": q.paragraph.created_at.isoformat()
+                # ISO format ensures consistent datetime representation
             })
         
+        # Final structured response sent to the client
         return Response({
-            "word": word,
-            "total_results": len(results),
-            "results": results
+            "word": word,                         # Searched keyword
+            "total_results": len(results),        # Number of matches returned
+            "results": results                    # Top paragraphs by frequency
         })
