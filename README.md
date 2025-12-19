@@ -99,30 +99,39 @@ Why Docker Compose:
 ## 📂 Project Structure
 
 codemonk_backend/
-├── app/
-│   ├── manage.py
-│   ├── core/
-│   │   ├── settings.py
-│   │   ├── urls.py
-│   │   ├── celery.py
-│   │   └── password utilities & validators
-│   ├── auth_app/
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   └── urls.py
-│   └── text_app/
-│       ├── models.py
-│       ├── tasks.py
-│       ├── views.py
-│       └── urls.py
-│
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-├── entrypoint.sh
-├── .env.example
-└── README.md
+
+- app/
+
+    - manage.py
+
+    - core/
+
+        - settings.py
+        - urls.py
+        - celery.py
+        - password utilities & validators
+
+    - auth_app/
+
+        - models.py
+        - serializers.py
+        - views.py
+        - urls.py
+
+    - text_app/
+
+        - models.py
+        - tasks.py
+        - views.py
+        - urls.py
+
+
+- Dockerfile
+- docker-compose.yml
+- requirements.txt
+- entrypoint.sh
+- .env.example
+- README.md
 
 Each module has a single responsibility, improving maintainability and readability.
 
@@ -327,6 +336,7 @@ LeetCode: https://leetcode.com/u/NDvaDaMsfm/
 ### ✅ Submission Ready
 
 This README fully satisfies Codemonk’s expectations for documentation, clarity, design understanding, and reproducibility.
+
 
 
 
