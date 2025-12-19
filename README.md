@@ -131,20 +131,19 @@ Used specifically for **word frequency computation**.
 
 ---
 
-## 🏗 System Architecture (High-Level)
+## 🏗 System Architecture (High-Level) 
 
-Client (Postman / Frontend)
-↓
-Django REST APIs
-↓
-PostgreSQL (Persistent Storage)
-↓
-Celery (Async Processing)
-↓
-Redis (Message Broker)
+Client (Postman / Frontend)  >>> 
 
-yaml
-Copy code
+Django REST APIs  >>> 
+
+PostgreSQL (Persistent Storage) >>> 
+
+Celery (Async Processing)  >>> 
+
+Redis (Message Broker)  >>> 
+
+
 
 ---
 
@@ -418,6 +417,7 @@ production-aware decisions,
 and clear technical communication.
 
 The system runs end-to-end with a single command, and I am fully prepared to explain every architectural and code-level decision during the technical interview.
+
 
 
 
